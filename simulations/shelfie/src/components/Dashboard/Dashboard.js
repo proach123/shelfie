@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import Form from '../Form/Form';
 import axios from 'axios';
-import Header from '../Header/Header'
 import Product from './Product/Product'
 
 
@@ -11,7 +10,7 @@ class Dashboard extends Component {
     super();
 
     this.state = {
-      inventory: [],
+      inventories:[],
       input: '',
       img: '',
       name: '',
@@ -20,11 +19,6 @@ class Dashboard extends Component {
     };
   }
 
-  handleInput(val) {
-    this.setState({
-      input: val
-    });
-  }
 
   componentDidMount() {
     axios.get('/api/inventory').then(res => {
@@ -40,7 +34,10 @@ class Dashboard extends Component {
     axios.post('/api/inventory', { inventory: input }).then(res => {
       this.setState({
         inventories: res.data,
-        input: ''
+        input: '',
+        name: '',
+        price:'',
+        img: ''
       });
     });
   }
@@ -71,6 +68,14 @@ class Dashboard extends Component {
       });
     });
   };
+  cancelAddtoInv(){
+      this.setState({
+        img: '',
+        name: '',
+        price: ''
+      })
+         }
+
           handleImg(val) {
           this.setState({
             img: val
@@ -91,39 +96,36 @@ class Dashboard extends Component {
     const mappedInventory = this.state.inventories.map(inventory => {
       return (
         <Form
-          key={inventory.inventory_id}
+          key={inventory.id}
           inventory={inventory}
           deleteInventory={this.deleteInventory}
           updateInventory={this.updateInventory}
+          onEdit ={this.onEdit}
         />
       );
     });
     return (
       <div className="App">
-        <input
-          type="text"
-          value={this.state.input}
-          onChange={e => this.handleInput(e.target.value)}
-        />
+       
         <input type="text"
+          placeholder='img'
             value={this.state.img}
             onChange={e => this.handleImg(e.target.value)}/>
         <input type="text"
+          placeholder='name'
             value={this.state.name}
             onChange={e => this.handleName(e.target.value)}/>
         <input type="text"
+          placeholder='price'
             value={this.state.price}
             onChange={e => this.handlePrice(e.target.value)}/>
   
         <button onClick={() => this.cancelAddtoInv()}>Cancel</button>
-        <button>Add to inventory</button>
-  
-         <Dashboard/>
-         <Form/>
-         <Header/>
+        
+
          <Product/>
         <button onClick={() => this.postInventory()}>Add to Inventory</button>
-        {mappedInventory}
+       {mappedInventory}
       </div>
     );
   }
